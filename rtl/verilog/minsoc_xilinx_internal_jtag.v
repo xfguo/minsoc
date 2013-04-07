@@ -251,6 +251,38 @@ BSCAN_SPARTAN3A BSCAN_SPARTAN3A_inst (
 assign pause_dr_o = 1'b0;
 assign run_test_idle_o = 1'b0;
 
+
+
+//-----------------------------------------------------------------------
+`else
+ `ifdef SPARTAN6
+
+   wire capture_dr_o;
+   
+BSCAN_SPARTAN6 #(
+.JTAG_CHAIN(1) // Chain number.
+)
+BSCAN_SPARTAN6_inst ( 
+.CAPTURE(capture_dr_o), // 1-bit Scan Data Register Capture instruction.
+.DRCK(drck), // 1-bit Scan Clock instruction. DRCK is a gated version of TCTCK, it toggles during the CAPTUREDR and SHIFTDR states. 
+.RESET(test_logic_reset_o), // 1-bit Scan register reset instruction.
+.RUNTEST(), // 1-bit Asserted when TAP controller is in Run Test Idle state. Make sure is the same  name as BSCAN primitive used in Spartan products.
+.SEL(debug_select_o), // 1-bit Scan mode Select instruction.
+.SHIFT(shift_dr_o), // 1-bit Scan Chain Shift instruction.
+.TCK(tck_o), // 1-bit Scan Clock. Fabric connection to TAP Clock pin.
+.TDI(tdi_o), // 1-bit Scan Chain Output. Mirror of TDI input pin to FPGA.
+.TMS(), // 1-bit Test Mode Select. Fabric connection to TAP.
+.UPDATE(update_dr_o), // 1-bit Scan Register Update instruction.
+.TDO(debug_tdo_i) // 1-bit Scan Chain Input.
+);
+// End of BSCAN_SPARTAN6_inst instantiation
+  
+assign pause_dr_o = 1'b0;
+assign run_test_idle_o = 1'b0;
+
+
+
+ 
 `else
 `ifdef VIRTEX
 
@@ -436,6 +468,8 @@ assign update_dr_o = update_out;
 `endif
 `endif
 `endif
+`endif // !`ifdef SPARTAN3
+`endif // !`ifdef SPARTAN2
 `endif
 
 endmodule
